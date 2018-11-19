@@ -1,23 +1,4 @@
 {
-  "cpt": {
-    "code": "cpt",
-    "name": "Cape Town",
-    "logo": "/img/municipalities/cpt-logo.png",
-    "bylaws-url": " http://www.capetown.gov.za/bylaws"
-  },
-  "eth": {
-    "code": "eth",
-    "name": "eThekwini",
-    "partial": true,
-    "logo": "/img/municipalities/eth-logo.png",
-    "bylaws-url": "http://www.durban.gov.za/Resource_Centre/Pages/By-Laws.aspx"
-  },
-  "jhb": {
-    "code": "jhb",
-    "name": "Johannesburg",
-    "logo": "/img/municipalities/jhb-logo.png",
-    "bylaws-url": "https://www.joburg.org.za/documents_/By-Laws/Pages/By-Laws.aspx"
-  },
   "wc033": {
     "code": "wc033",
     "name": "Cape Agulhas",
@@ -25,6 +6,7 @@
     "bylaws-url": "http://www.capeagulhas.org/resource-category/policies-and-laws",
     "website-url": "http://www.capeagulhas.org/",
     "bucket": "capeagulhas.openbylaws.org.za",
+    "microsite_domain": "capeagulhas.openbylaws.org.za",
     "microsite": true,
     "ga": "UA-123714032-1"
   },
@@ -35,6 +17,7 @@
     "bylaws-url": "http://www.matzikamamun.co.za/resource-category/policies-and-laws",
     "website-url": "http://www.matzikamamun.co.za/",
     "bucket": "matzikama.openbylaws.org.za",
+    "microsite_domain": "matzikama.openbylaws.org.za",
     "microsite": true,
     "ga": "UA-123714032-2"
   },
@@ -45,6 +28,7 @@
     "bylaws-url": "http://www.mbizana.gov.za/by-laws/",
     "website-url": "http://www.mbizana.gov.za",
     "bucket": "mbizana.openbylaws.org.za",
+    "microsite_domain": "mbizana.openbylaws.org.za",
     "microsite": true,
     "ga": "UA-123714032-3"
   }
