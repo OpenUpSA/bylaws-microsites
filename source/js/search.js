@@ -25,7 +25,7 @@ ByLawSearch = function() {
     
     if (region_code) {
       params.frbr_uri__startswith = '/za-' + region_code + '/';
-      params.o = REGIONS[region_code].bucket;
+      params.o = REGIONS[region_code].microsite_domain;
     }
 
     $.getJSON('https://srbeugae08.execute-api.eu-west-1.amazonaws.com/default/searchOpenBylaws', params, function(response, textStatus, jqXHR) {
