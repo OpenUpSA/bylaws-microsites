@@ -27,7 +27,7 @@
     "logo": "/img/municipalities/ec443-logo.png",
     "bylaws-url": "http://www.mbizana.gov.za/by-laws/",
     "website-url": "http://www.mbizana.gov.za",
-    "bucket": "mbizana.openbylaws.org.za",
+    "bucket": "bylaws-ec443-mbizana",
     "microsite_domain": "mbizana.openbylaws.org.za",
     "microsite": true,
     "ga": "UA-123714032-3"
