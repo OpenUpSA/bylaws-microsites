@@ -76,10 +76,6 @@ To deploy the site, a full copy is generated locally and then uploaded to S3.
 
 # Licence
 
-The XML and HTML versions of the legislation documents are licensed under a
-[Creative Commons Attribution 2.5 South Africa License](http://creativecommons.org/licenses/by/2.5/za/deed.en_US). 
-
-The website software, excluding the HTML and XML versions of the legislation documents,
-is licensed under the MIT license.
+The website software is licensed under the MIT license.
 
 See [LICENSE](LICENSE) for full license information.
