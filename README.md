@@ -53,8 +53,12 @@ To build and sync the entire site just like Travis does (ie. clean, build and sy
 3. Source a placard image and save it as `/img/municipalities/<code>-placard.jpg`
 4. Source the municipality's logo and save it as `/img/municipalities/<code>-logo.png`
 5. Add a `REGION=<code>` entry to the `matrix` element of `.travis.yml` so that travis builds the microsite.
-6. Create an appropriate S3 bucket in Greg's AWS S3 Account: `<name>.openbylaws.org.za`
-7. Create a corresponding cloudfront distribution, and create a DNS entry in Route 53.
+6. Create a new AWS S3 bucket in the EU region, using the naming convention `bylaws-CODE-NAME`, such as `bylaws-ec443-mbizana`.
+7. Once created, go to Properties and setup the bucket to host a website under “Static Website Hosting”
+8. Go to Permissions > Public access settings and click Edit.
+9. Uncheck the “Block new public ACLs and uploading public objects” and “Remove public access granted through public ACLs” boxes so that we can give public access to this bucket.
+10. Go to Permissions > Access Control List and, under Public access, ensure Everyone can LIST bucket contents. 
+11. Ask greg@kempe.net to create a corresponding cloudfront distribution under the openbylaws.org.za domain, and create a DNS entry in Route 53.
 
 # Architecture
 
