@@ -31,5 +31,16 @@
     "microsite_domain": "mbizana.openbylaws.org.za",
     "microsite": true,
     "ga": "UA-123714032-3"
+  },
+  "buf": {
+    "code": "buf",
+    "name": "Buffalo City",
+    "logo": "/img/municipalities/buf-logo.png",
+    "bylaws-url": "https://www.buffalocitymetro.gov.za/Documents/Index/160",
+    "website-url": "https://www.buffalocitymetro.gov.za/",
+    "bucket": "bylaws-buf-buffalocity",
+    "microsite_domain": "buffalocity.openbylaws.org.za",
+    "microsite": true,
+    "ga": "UA-123714032-2"
   }
 }
