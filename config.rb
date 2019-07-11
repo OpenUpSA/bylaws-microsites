@@ -98,7 +98,7 @@ for lang in region.bylaws.languages
   proxy path, "/templates/region.html", locals: {region: region, language: lang}, ignore: true
 end
 
-region.bylaws.each { |bylaw| pages_for_act(bylaw) }
+region.bylaws.reject(&:stub).each { |bylaw| pages_for_act(bylaw) }
 
 # s3 bucket
 s3_sync_config.bucket = region.bucket
