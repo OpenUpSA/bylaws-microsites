@@ -1,7 +1,10 @@
-@import 'bootstrap.min.css';
-@import 'bootstrap-theme.min.css';
-@import 'html5bootstrap.css';
-@import 'font-awesome.min.css';
+body {
+  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5 {
+  font-family: 'Merriweather', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
 
 .navbar {
   margin-bottom: 0px;
@@ -11,17 +14,8 @@
 
 #header {
   a.navbar-brand {
-    background-image: url(/img/logo-md-inv.png);
-    background-repeat: no-repeat;
-    background-position: 0px 7px;
-    background-size: 35px;
-
-    padding-left: 45px;
-    margin: 0px;
-    @media (max-width: 768px) {
-      margin-left: 15px;
-    }
-
+    float: left;
+    height: 50px;
     color: white;
   }
 
@@ -42,45 +36,23 @@
   }
 }
 
-.microsite {
-  #main-content .header-content {
+#main-content .header-content {
+  h1, h2 {
     margin-left: 85px;
-  }
 
-  #header a.navbar-brand {
-    background-image: none;
-    padding-left: 0px;
-  }
-}
-
-.powered-by-banner {
-  background-color: #444;
-  color: #ddd;
-  padding: 4px 0px;
-  font-size: 12px;
-
-  a {
-    color: #ddd;
-    text-decoration: underline;
+    @media (max-width: 540px) {
+      margin-left: 70px;
+    }
   }
 }
 
 #footer {
-  background-color: #eee;
-  border-top: 1px solid #ccc;
-  padding: 10px 0px;
-
-  color: #777;
-
-  h5 {
-    text-transform: uppercase;
-  }
+  background-color: #e9ecef;
+  margin-top: 5rem;
 
   ul {
     padding-left: 0px;
     list-style: none;
-    li {
-    }
   }
 
   a[rel="license"] > img {
@@ -89,34 +61,12 @@
   }
 }
 
-.microsite-footer {
-  .region-logo {
-    width: 100px;
-  }
-
-  .openup-logo {
-    width: 75px;
-  }
-}
-
-.microsite-header {
-  a.website-link {
-    color: white !important;
-    font-size: 16px;
-  }
-
-  .navbar-collapse.in {
-    padding-top: 30px;
-  }
-}
-
 #main-content {
   margin-bottom: 40px;
 
   header {
-    background-color: #eee;
+    background-color: #e9ecef;
     padding: 10px 0px;
-    border-bottom: 1px solid #ccc;
 
     h1 {
       margin: 0px;
@@ -125,6 +75,10 @@
       a {
         color: inherit;
       }
+    }
+
+    h2 {
+      font-size: 19px;
     }
 
     .breadcrumbs {

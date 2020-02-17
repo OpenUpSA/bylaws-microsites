@@ -73,21 +73,39 @@ class IndigoComponent < IndigoBase
       info = JSON.parse(get('.json'))
     end
 
-    @info = _transform(Hashie::Mash.new(info))
+    @info = Hashie::Mash.new(_transform(info))
     @parent = parent
   end
 
   def html
-    @html ||= get_html
+    @html ||= _process_html(get_html)
   end
 
   def get_html
-    # fetch html remotely
-    get('.html')
+    # fetch html remotely, without resolver links
+    get('.html', {resolver: 'no'})
   end
 
   def text
     @text ||= Nokogiri::HTML(html).inner_text
+  end
+
+  # pre-process HTML from Indigo
+  def _process_html(html)
+    html = Nokogiri::HTML(html)
+
+    for a in html.css("a[href]")
+      if a['href'].start_with? '/za-' and !a['href'].end_with?('/eng')
+        # ensure local links end with '/eng'
+        a['href'] = a['href'] + '/eng'
+
+      elsif !a['href'].start_with? 'http' and !a['href'].start_with? '#'
+        # ensure other links go via the resolver
+        a['href'] = 'https://edit.laws.africa/resolver/resolve' + a['href']
+      end
+    end
+
+    html.to_html
   end
 
   # make some changes to the incoming hash
@@ -97,11 +115,14 @@ class IndigoComponent < IndigoBase
       item.each { |e| _transform(e) }
     when Hash
       # dates into Date objects
-      for key in [:date, :updated_at, :created_at, :expression_date, :commencement_date, :assent_date, :publication_date]
+      for key in ['date', 'updated_at', 'created_at', 'expression_date', 'commencement_date', 'assent_date', 'publication_date']
         if item.has_key? key and item[key].is_a? String
           item[key] = Date.parse(item[key])
         end
       end
+
+      # size to _size to avoid Hashie conflict
+      item['_size'] = item.delete('size') if item.has_key? 'size'
 
       item.each_value { |e| _transform(e) }
     end
@@ -127,10 +148,6 @@ class IndigoDocument < IndigoComponent
 
   def region_code
     frbr_uri.split('/', 3)[1].split('-')[1]
-  end
-
-  def get_html
-    get('.html', {coverpage: 0})
   end
 
   def schedules
@@ -168,23 +185,15 @@ class IndigoDocument < IndigoComponent
   end
 
   def local_pdf_url
-    "#{frbr_uri}/resources/#{language}.pdf"
+    "resources/#{language}.pdf"
   end
 
   def local_epub_url
-    "#{frbr_uri}/resources/#{language}.epub"
+    "resources/#{language}.epub"
   end
 
   def local_standalone_html_url
-    "#{frbr_uri}/resources/#{language}.html"
-  end
-
-  def source_enacted
-    attachments.find { |a| a.filename == 'source-enacted.pdf' }
-  end
-
-  def source_current
-    attachments.find { |a| a.filename == 'source.pdf' }
+    "resources/#{language}.html"
   end
 
   # Return a list of HistoryEvent objects describing the history of this document,
@@ -196,7 +205,6 @@ class IndigoDocument < IndigoComponent
       @events << HistoryEvent.new(assent_date, :assent) if assent_date
       @events << HistoryEvent.new(publication_date, :publication) if publication_date
       @events << HistoryEvent.new(commencement_date, :commencement) if commencement_date
-      @events << HistoryEvent.new(updated_at, :updated)
 
       for amendment in amendments
         @events << HistoryEvent.new(amendment.date, :amendment, amendment)
@@ -206,7 +214,10 @@ class IndigoDocument < IndigoComponent
         @events << HistoryEvent.new(repeal.date, :repeal, repeal)
       end
 
-      @events.sort_by! { |e| e.date }
+      @events = @events.group_by(&:date).to_a
+
+      # turn into pairs, sorted by descending date
+      @events.sort_by! { |x| x[0] }.reverse!
     end
 
     @events
@@ -231,18 +242,51 @@ class IndigoDocument < IndigoComponent
     self.points_in_time.find { |p| p.date == expression_date }
   end
 
-  # Get a new IndigoDocument corresponding to the expression at the given
-  # date and language.
-  def get_expression(language, date=nil)
-    date = date || self.expression_date
-    pit = point_in_time(date)
-    raise "Unable to find point in time for #{date} for #{frbr_uri}" if pit.nil?
-    expr = pit.expressions.find { |e| e.language == language }
+  # Try to get an expression at a date a language, falling back to
+  # English if necessary.
+  def get_best_expression(language, date)
+    candidates = expressions.select { |x| x.expression_date == date }
+    expr = candidates.select { |x| x.language == language }
+    return expr.first if expr.size > 0
 
-    if expr
-      # fold expression info into this document's info, and return a new document
-      info = @info.clone.update(expr)
-      return IndigoDocument.new(info.url, info)
+    if language == 'eng'
+      # no matching language, just use the first one
+      return candidates.first
+    else
+      # try english
+      return get_best_expression('eng', date)
+    end
+  end
+
+  def expressions
+    return [] if stub
+
+    # load a new expression for each pit
+    return points_in_time.map { |pit|
+      pit.expressions.map { |expr|
+        if self.expression_frbr_uri == expr.expression_frbr_uri
+          self
+        else
+          IndigoDocument.new(expr.url)
+        end
+      }
+    }.flatten
+  end
+
+  def latest_expression?
+    return stub || (expression_date == points_in_time[-1].date)
+  end
+
+  # Latest expression for this work, trying to match on current language
+  def latest_expression
+    get_best_expression(language, points_in_time[-1].date)
+  end
+
+  def next_pit_date
+    # date of next point in time after this one.
+    ix = points_in_time.index { |p| p.date == expression_date } + 1
+    if ix < points_in_time.size
+      points_in_time[ix].date - 1
     end
   end
 
@@ -260,10 +304,6 @@ class IndigoDocument < IndigoComponent
 end
 
 class IndigoAttachment < IndigoComponent
-  def local_url
-    # TODO: LANG
-    @parent.frbr_uri + "/media/" + filename
-  end
 end
 
 # document collection loaded from Indigo
@@ -296,14 +336,9 @@ class IndigoDocumentCollection < IndigoBase
     # ignore documents that have the 'amendment' tag and are stubs
     docs = @documents.select { |d| !d.stub }
 
-    # favour documents in the given language
     docs.map do |doc|
-      # is there a doc in the correct language?
-      if doc.language != lang
-        doc = doc.get_expression(lang) || doc
-      end
-
-      doc
+      # favour documents in the given language, falling back to english
+      doc.get_best_expression(lang, doc.points_in_time[-1].date)
     end
   end
 end
@@ -344,37 +379,46 @@ class IndigoMiddlemanExtension < ::Middleman::Extension
   def add_files(resources)
     for region in ActHelpers.active_regions
       for bylaw in region.bylaws.reject(&:stub)
-        # strip leading and trailing slash
-        path = bylaw.frbr_uri.chomp('/')[1..-1]
+        for expr in bylaw.expressions
+          add_files_for_expression(resources, expr, expr.expression_frbr_uri)
 
-        for lang in bylaw.languages
-          expr = bylaw.get_expression(lang.code3)
-
-          # include PDF, HTML and ePUB downloads for all available languages
-          for ext, url in [['pdf', 'pdf_url'], ['epub', 'epub_url'], ['html', 'standalone_html_url']]
-            target = "#{path}/resources/#{lang.code3}.#{ext}"
-            source = app.source_dir.to_s + "/../downloads/" + target.gsub("/", "-")
-
-            res = DownloadResource.new(app.sitemap, target, source)
-            res.options[:download_from] = expr.send(url)
-            res.download!
-
-            resources.append(res)
-          end
-
-          # include attachments
-          for attachment in expr.attachments
-            target = "#{path}/#{lang.code3}/media/#{attachment.filename}"
-            source = app.source_dir.to_s + "/../downloads/media-" + target.gsub("/", "-")
-
-            res = DownloadResource.new(app.sitemap, target, source)
-            res.options[:download_from] = attachment.url
-            res.download!
-
-            resources.append(res)
+          # for the latest expression, also add resources under the generic URL
+          if expr.expression_date == bylaw.expression_date
+            add_files_for_expression(resources, expr, expr.frbr_uri + "/" + expr.language)
           end
         end
       end
+    end
+
+    resources
+  end
+
+  def add_files_for_expression(resources, expr, frbr_uri)
+    # strip leading and trailing slash
+    path = frbr_uri.chomp('/')[1..-1]
+
+    # include PDF, HTML and ePUB downloads
+    for ext, url in [['pdf', 'pdf_url'], ['epub', 'epub_url'], ['html', 'standalone_html_url']]
+      target = "#{path}/resources/#{expr.language}.#{ext}"
+      source = app.source_dir.to_s + "/../downloads/" + target.gsub("/", "-")
+
+      res = DownloadResource.new(app.sitemap, target, source)
+      res.options[:download_from] = expr.send(url)
+      res.download!
+
+      resources.append(res)
+    end
+
+    # include image attachments
+    for attachment in expr.attachments.filter { |a| a.mime_type.start_with?('image/') }
+      target = "#{path}/media/#{attachment.filename}"
+      source = app.source_dir.to_s + "/../downloads/media-" + target.gsub("/", "-")
+
+      res = DownloadResource.new(app.sitemap, target, source)
+      res.options[:download_from] = attachment.url
+      res.download!
+
+      resources.append(res)
     end
 
     resources

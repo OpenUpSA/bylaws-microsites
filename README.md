@@ -16,7 +16,7 @@ To setup a local development environment:
 
 1. clone this repo
 2. install dependencies: `bundle install`
-3. get the Indigo Auth token from [indigo.openbylaws.org.za](https://indigo.openbylaws.org.za)
+3. get the Indigo Auth token from [edit.laws.africa](https://edit.laws.africa)
 3. run the server: `INDIGO_API_AUTH_TOKEN=xxx REGION=wc033 middleman`
 
 The website pulls all data from [indigo.openbylaws.org.za](http://indigo.openbylaws.org.za).
