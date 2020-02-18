@@ -1,22 +1,17 @@
 %header#header.microsite-header
-  %nav.navbar.navbar-inverse(role="navigation")
+  %nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.p-1(role="navigation")
     .container
-      .navbar-header
-        %button(type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false")
-          %span.sr-only Toggle navigation
-          %span.icon-bar
-          %span.icon-bar
-          %span.icon-bar
+      %a.navbar-brand.mr-5(href='/')
+        %img.microsite-region-logo{src: config[:region].logo}
+        .microsite-region-name #{config[:region].name} By-laws
 
-        %a.navbar-brand(href='/')
-          %img.microsite-region-logo{src: config[:region].logo}
-          .microsite-region-name #{config[:region].name} By-laws
+      %button.navbar-toggler(type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation")
+        %span.navbar-toggler-icon
 
-      #navbar-collapse.collapse.navbar-collapse
-        %ul.nav.navbar-nav.navbar-right
-          %li
-            %form(action="/search.html" class="navbar-form navbar-right" method="get" role="search")
-              %input(class="form-control" name="q" placeholder="Search by-laws" type="text")
-              %input{type: "hidden", name: "region", value: config[:region]['code']}
-          %li
-            %a.website-link{href: config[:region]['website-url']} #{config[:region].name} website →
+      #navbarSupportedContent.collapse.navbar-collapse
+        %form.form-inline.ml-auto.mr-3.my-2.my-lg-0(action="/search.html" method="get" role="search")
+          %input.form-control(type="text" name="q" placeholder="Search" aria-label="Search")
+          %input{type: "hidden", name: "region", value: config[:region]['code']}
+        %ul.navbar-nav
+          %li.nav-item
+            %a.text-white{href: config[:region]['website-url']} #{config[:region].name} website →

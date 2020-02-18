@@ -1,17 +1,42 @@
 = wrap_layout :site do
   - content_for :head do
     = stylesheet_link_tag 'bylaw.css', media: "screen, print"
+    = stylesheet_link_tag 'https://cdn.jsdelivr.net/gh/laws-africa/indigo-web@3.10.0/css/akoma-ntoso.min.css', media: "screen, print"
 
     %meta(property="og:type" content="article")
     %meta{property: "og:url", content: act_url(act, external: true)}
+    %link{rel: "canonical", href: 'https://' + config[:region]['microsite_domain'] + act.frbr_uri + "/eng/"}
 
   - content_for :meta_description do
     #{act.title} for #{regions[act.locality].name}
 
-  %header
+  %header{class: act.stub ? "" : "pb-0"}
     .container
       .header-content
         = partial 'header', locals: {act: act}
+
+        - if not act.stub
+          %nav.bylaw-nav
+            %ul.nav.nav-tabs(role="tablist")
+              %li.nav-item
+                %a#main-tab.nav-link.active(href='#main' data-toggle="tab" role="tab" aria-controls="main" aria-selected="true") By-law
+
+              %li.nav-item
+                %a#toc-tab.nav-link(href='#toc' data-toggle="tab" role="tab" aria-controls="toc")
+                  %span.d-none.d-sm-inline Table of
+                  Contents
+
+              %li.nav-item
+                %a#resources-tab.nav-link(href='#resources' data-toggle="tab" role="tab" aria-controls="resources")
+                  History
+
+              %li.ml-auto.d-none.d-md-block.social-buttons
+                %a.fb-share{href: "#"}
+                  %i.fab.fa-facebook
+                  Share
+                %a.twitter-share{href: "#", text: act.title}
+                  %i.fab.fa-twitter
+                  Tweet
 
   %article
     .container
@@ -21,7 +46,7 @@
 
           %ul.list-inline
             - for lang in act.languages
-              %li
+              %li.list-inline-item
                 %a{href: act_url(act, language: lang.code3), class: act.language == lang.code3 ? 'text-muted' : ''}&= lang.name
 
       = partial 'notices', locals: {act: act}
